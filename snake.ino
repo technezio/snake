@@ -8,7 +8,7 @@
 #include <ledMatrix.h>
 #include "snake_class.h"
 
-ledMatrix myMatrix(8,10,12);
+ledMatrix myMatrix(8,10,12);  // Data, Latch, Clock
 
 Snake mySnake;
 
@@ -86,4 +86,3 @@ void snakePrint(const Snake& s)
   // Actually display matrix content
   myMatrix.load();
 }
-
