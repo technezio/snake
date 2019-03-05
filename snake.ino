@@ -12,10 +12,18 @@ ledMatrix myMatrix(8,10,12);  // Data, Latch, Clock
 
 Snake mySnake;
 
+#define PIN_X_AXIS A1
+#define PIN_Y_AXIS A2
+
+#define TIME_STEP 500
+
 boolean eaten = true;
 char val;
 byte x;
 byte y;
+int joyX;
+int joyY;
+unsigned long int old_timestamp, new_timestamp;
 
 void setup()
 {
@@ -35,6 +43,11 @@ void loop()
       Serial.read();
   }
 
+  // Read joystick
+  joyX = analogRead( PIN_X_AXIS );
+  joyY = analogRead( PIN_Y_AXIS );
+
+  // Evaluate serial command
   switch(val)
   {
   case 'w':
@@ -51,8 +64,21 @@ void loop()
     break;
   }
 
-  mySnake.move();
+  // Evaluate joystick position
+  // WARNING!! Bigger X is right, bigger Y is down
+  if( joyX > 600 ) mySnake.changeDir(RIGHT);
+  else if( joyX < 400 ) mySnake.changeDir(LEFT);
+  else if( joyY > 600 ) mySnake.changeDir(DOWN);
+  else if( joyY < 400 ) mySnake.changeDir(UP);
+  joyX = joyY = 500;
 
+  // Next move
+  new_timestamp = millis();
+  if( (new_timestamp - old_timestamp) > TIME_STEP ) {
+    mySnake.move();
+    old_timestamp = new_timestamp;
+  }
+  
   // If apple has been eaten, draw new one
   if( eaten )
   {
@@ -67,7 +93,7 @@ void loop()
   }
 
   snakePrint(mySnake);
-  delay(500);
+  delay(10);
 }
 
 void snakePrint(const Snake& s)
